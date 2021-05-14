@@ -2,10 +2,33 @@ import os
 import cv2 as cv
 import numpy as np
 
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+
+def get_hog():
+    winSize = (30, 30)
+    blockSize = (10, 10)
+    blockStride = (5, 5)
+    cellSize = (5, 5)
+    nbins = 9
+    derivAperture = 1
+    winSigma = -1.
+    histogramNormType = 0
+    L2HysThreshold = 0.2
+    # gammaCorrection = 1
+    gammaCorrection = False
+    nlevels = 64
+    signedGradient = True
+
+    return cv.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
+
+
 def entrada(train_dir):
-    hog = cv.HOGDescriptor()
-    X = np.empty((0, hog.getDescriptorSize()))
-    y = np.empty((0, 1))
+
+    hog = get_hog()
+
+    X = np.array([])
+    y = np.array([])
     # Iterar sobre todas las sub-carpetas de train
     for sub_dir in os.listdir(train_dir):
         list_sub_dir = os.listdir(train_dir+"/"+sub_dir)
@@ -21,15 +44,29 @@ def entrada(train_dir):
             img = cv.resize(img, (30, 30), interpolation=cv.INTER_LINEAR)
             img = np.uint8(img)
 
-            winStride = (8, 8)
-            padding = (8, 8)
-            locations = ((10, 20),)
-            descriptores = hog.compute(img, winStride, padding, locations)
+            descriptores = hog.compute(img)
             X_sub[i] = np.reshape(descriptores, (1, hog.getDescriptorSize()))
+            y_sub[i] = int(sub_dir) * y_sub[i]
 
         # Apilar arrays
-        #np.hstack(X, X_sub)
-        #np.hstack(y, y_sub)
+        if (X.shape[0] < 1):
+            X = X_sub
+            y = y_sub
+        else:
+            X = np.vstack((X, X_sub))
+            y = np.vstack((y, y_sub))
+
+    return X, np.reshape(y, (y.shape[0], ))
 
 
-entrada("data/train_recortadas")
+def reducir_dimensionalidad(X, y):
+    lda = LinearDiscriminantAnalysis()
+    lda.fit(X, y)
+
+    Z = lda.transform(X)
+    return Z
+
+
+X, y = entrada("data/train_recortadas")
+
+Z = reducir_dimensionalidad(X, y)
