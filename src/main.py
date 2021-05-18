@@ -79,28 +79,32 @@ def entrada_test(test_dir, hog):
     return X, np.reshape(y, (y.shape[0], ))
 
 
+def entrenarLDA(X, y, lda):
+    lda.fit(X, y)
+    return lda.transform(X)
+
+def clasificarLDA(X, y, lda):
+    y_predicted = lda.predict(X)
+    n_aciertos = np.sum(y == y_predicted)
+    return round(n_aciertos / y_predicted.shape[0] * 100, 2)
+
+
 ## Main
 hog = get_hog()
 train_dir = "data/train_recortadas"
 test_dir = "data/test_reconocimiento"
 
 X, y = entrada_train(train_dir, hog)
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
 lda = LinearDiscriminantAnalysis()
+Z = entrenarLDA(X_train, y_train, lda)
 
-lda.fit(X_train, y_train)
-Z = lda.transform(X_train)
-print("LDA:", X_train.shape, '-->', Z.shape)
+print("Reducción de la Dimensionalidad:", X_train.shape[1], '-->', Z.shape[1])
 
-y_predicted = lda.predict(X_test)
-n_aciertos = np.sum(y_test == y_predicted)
-print("Acierto sobre el mismo conjunto de datos:", round(n_aciertos/y_test.shape[0] * 100, 2), '%')
+print("Acierto sobre el mismo conjunto de datos:", clasificarLDA(X_test, y_test, lda), '%')
 
-
+## Test Reconocimiento
 X_test_recon, y_test_recon = entrada_test(test_dir, hog)
 
-y_predicted_recon = lda.predict(X_test_recon)
-n_aciertos_recon = np.sum(y_test_recon == y_predicted_recon)
-print("Acierto sobre el conjunto de datos de reconocimiento:", round(n_aciertos_recon/y_test_recon.shape[0] * 100, 2), '%')
+print("Acierto sobre el conjunto de datos de reconocimiento:", clasificarLDA(X_test_recon, y_test_recon, lda), '%')
