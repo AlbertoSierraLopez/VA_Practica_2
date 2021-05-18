@@ -2,6 +2,7 @@ import os
 import cv2 as cv
 import numpy as np
 
+from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 
@@ -23,9 +24,7 @@ def get_hog():
     return cv.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
 
 
-def entrada(train_dir):
-
-    hog = get_hog()
+def entrada_train(train_dir, hog):
 
     X = np.array([])
     y = np.array([])
@@ -42,7 +41,6 @@ def entrada(train_dir):
             img = cv.imread(train_dir+"/"+sub_dir+"/"+file, 0)
             img = cv.equalizeHist(img)
             img = cv.resize(img, (30, 30), interpolation=cv.INTER_LINEAR)
-            img = np.uint8(img)
 
             descriptores = hog.compute(img)
             X_sub[i] = np.reshape(descriptores, (1, hog.getDescriptorSize()))
@@ -59,14 +57,50 @@ def entrada(train_dir):
     return X, np.reshape(y, (y.shape[0], ))
 
 
-def reducir_dimensionalidad(X, y):
-    lda = LinearDiscriminantAnalysis()
-    lda.fit(X, y)
+def entrada_test(test_dir, hog):
 
-    Z = lda.transform(X)
-    return Z
+    list_files = os.listdir(test_dir)
+    list_files.pop(0)
+    X = np.zeros((len(list_files), hog.getDescriptorSize())) #-1 porque la carpeta tiene un .directory
+    y = np.ones((len(list_files), 1))
+
+    for i in range(len(list_files)):
+        file = list_files[i]
+        file_name = file.split('-')
+        # Procesar imagen
+        img = cv.imread(test_dir + "/" + file, 0)
+        img = cv.equalizeHist(img)
+        img = cv.resize(img, (30, 30), interpolation=cv.INTER_LINEAR)
+
+        descriptores = hog.compute(img)
+        X[i] = np.reshape(descriptores, (1, hog.getDescriptorSize()))
+        y[i] = int(file_name[0]) * y[i]
+
+    return X, np.reshape(y, (y.shape[0], ))
 
 
-X, y = entrada("data/train_recortadas")
+## Main
+hog = get_hog()
+train_dir = "data/train_recortadas"
+test_dir = "data/test_reconocimiento"
 
-Z = reducir_dimensionalidad(X, y)
+X, y = entrada_train(train_dir, hog)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+
+lda = LinearDiscriminantAnalysis()
+
+lda.fit(X_train, y_train)
+Z = lda.transform(X_train)
+print("LDA:", X_train.shape, '-->', Z.shape)
+
+y_predicted = lda.predict(X_test)
+n_aciertos = np.sum(y_test == y_predicted)
+print("Acierto sobre el mismo conjunto de datos:", round(n_aciertos/y_test.shape[0] * 100, 2), '%')
+
+
+X_test_recon, y_test_recon = entrada_test(test_dir, hog)
+
+y_predicted_recon = lda.predict(X_test_recon)
+n_aciertos_recon = np.sum(y_test_recon == y_predicted_recon)
+print("Acierto sobre el conjunto de datos de reconocimiento:", round(n_aciertos_recon/y_test_recon.shape[0] * 100, 2), '%')
