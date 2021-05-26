@@ -1,4 +1,4 @@
-import numpy as np
+from matplotlib import pyplot as plt
 
 from Aprendizaje import Aprendizaje
 from Evaluacion import Evaluacion
@@ -11,6 +11,7 @@ test_dir = "data/test_reconocimiento"
 
 aprendizaje = Aprendizaje()
 reconocimiento = Reconocimiento()
+evaluacion = Evaluacion()
 
 
 # Ejercicio 1
@@ -25,7 +26,9 @@ reconocimiento.load_data(test_dir, descriptor_type='hog', dimensions=(30, 30))
 predicted_LDA = reconocimiento.clasificar_LDA(lda)
 
 print("\tLDA Bayesiano")
-Evaluacion(predicted_LDA, reconocimiento.y_test).print_report(accuracy=False, precision=True, recall=True, f1=True)
+evaluacion.print_report(predicted_LDA, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
+# evaluacion.plot_matrix(lda, reconocimiento.X_test, reconocimiento.y_test)
+# plt.show()
 
 
 ## Ejercicio 2.2: KNN
@@ -37,7 +40,7 @@ Z_test_lda = aprendizaje.reducir_LDA(reconocimiento.X_test)
 predicted_LDA_KNN = reconocimiento.clasificar_KNN(Z_test_lda, knn_lda)
 
 print("\tKNN reducido con LDA")
-Evaluacion(predicted_LDA_KNN, reconocimiento.y_test).print_report(accuracy=False, precision=True, recall=True, f1=True)
+evaluacion.print_report(predicted_LDA_KNN, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
 
 
 ## Ejercicio 2.3: PCA
@@ -50,8 +53,7 @@ Z_test_pca = aprendizaje.reducir_PCA(reconocimiento.X_test)
 predicted_PCA_KNN = reconocimiento.clasificar_KNN(Z_test_pca, knn_pca)
 
 print("\tKNN reducido con PCA")
-Evaluacion(predicted_PCA_KNN, reconocimiento.y_test).print_report(accuracy=False, precision=True, recall=True, f1=True)
-
+evaluacion.print_report(predicted_PCA_KNN, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
 
 ## Ejercicio 2.3: LBP
 print("-- Descriptores LBP --")
@@ -65,5 +67,5 @@ reconocimiento.load_data(test_dir, descriptor_type='lbp', dimensions=(30, 30))
 predicted_LDA = reconocimiento.clasificar_LDA(lda)
 
 print("\tLDA Bayesiano")
-Evaluacion(predicted_LDA, reconocimiento.y_test).print_report(accuracy=False, precision=True, recall=True, f1=True)
+evaluacion.print_report(predicted_LDA, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
 
