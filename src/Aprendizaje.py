@@ -82,6 +82,50 @@ class Aprendizaje:
         self.y_train = np.reshape(y, (y.shape[0],))
 
 
+    def load_senales(self, train_dir, X_train_no, y_train_no, descriptor_type='hog', dimensions=(30, 30)):
+        X = np.array([])
+        y = np.array([])
+        # Iterar sobre todas las sub-carpetas de train
+        for sub_dir in os.listdir(train_dir):
+            list_sub_dir = os.listdir(train_dir + "/" + sub_dir)
+            X_sub = np.zeros((len(list_sub_dir), dimensions[0] * dimensions[1]))
+            y_sub = np.zeros((len(list_sub_dir), 1))
+            # Iterar sobre todas las imágenes de una carpeta
+            for i in range(len(list_sub_dir)):
+                file = list_sub_dir[i]
+
+                # Procesar imagen
+                img = cv.imread(train_dir + "/" + sub_dir + "/" + file, 0)
+                img = cv.equalizeHist(img)
+                img = cv.resize(img, dimensions, interpolation=cv.INTER_LINEAR)
+
+                descriptor = None
+                if descriptor_type == 'hog':
+                    descriptor = self.hog.compute(img)
+                elif descriptor_type == 'lbp':
+                    radius = 3
+                    n_points = 8 * radius
+                    descriptor = local_binary_pattern(img, n_points, radius, method='uniform')
+
+                if descriptor is None:
+                    raise Exception("No descriptor available")
+                else:
+                    X_sub[i] = np.reshape(descriptor, (1, dimensions[0] * dimensions[1]))
+                    y_sub[i] = 1
+
+            # Apilar arrays
+            if X.shape[0] < 1:
+                X = X_sub
+                y = y_sub
+            else:
+                X = np.vstack((X, X_sub))
+                y = np.vstack((y, y_sub))
+
+        self.X_train = np.vstack((X, X_train_no))
+        y = np.reshape(y, (y.shape[0], ))
+        self.y_train = np.concatenate([y, y_train_no])
+
+
     def entrenar_PCA(self):
         self.pca = PCA(len(np.unique(self.y_train)))
         self.pca.fit(self.X_train)
@@ -95,6 +139,7 @@ class Aprendizaje:
 
 
     def reducir_LDA(self, X):
+        self.lda.fit(self.X_train, self.y_train)
         Z = self.lda.transform(X)
         # print("Reducción de la Dimensionalidad LDA:", X.shape[1], '-->', Z.shape[1])
 

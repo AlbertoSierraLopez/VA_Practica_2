@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+
 
 from Aprendizaje import Aprendizaje
 from Evaluacion import Evaluacion
