@@ -19,3 +19,10 @@ class Evaluacion:
 
     def plot_matrix(self, clf, X_test, y_test):
         plot_confusion_matrix(clf, X_test, y_test)
+
+
+    def output(self, output_path, file_list, y_predicted):
+        output_file = open(output_path + "resultado.txt", "w+")
+
+        for i in range(len(file_list)):
+            output_file.write(str(file_list[i]) + "; " + str(int(y_predicted[i])).zfill(2) + '\n')

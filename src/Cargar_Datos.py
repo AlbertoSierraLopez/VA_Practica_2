@@ -123,8 +123,11 @@ class Cargar_Datos:
         X = np.zeros((len(list_files), dimensiones[0] * dimensiones[1]))
         y = np.ones((len(list_files), 1))
 
+        file_list = []
+
         for i in range(len(list_files)):
             file = list_files[i]
+            file_list.append(file)
             file_name = file.split('-')
             # Procesar imagen
             img = cv.imread(test_dir + file, 0)
@@ -147,4 +150,4 @@ class Cargar_Datos:
 
         y = np.reshape(y, (y.shape[0],))
 
-        return X, y
+        return X, y, file_list
