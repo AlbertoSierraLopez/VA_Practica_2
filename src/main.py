@@ -64,7 +64,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Debug
-    # debug()
+    debug()
 
     # Separar Datos de Entrada
     test_path1, test_path2 = separar_datos_entrada(args.test_path)
