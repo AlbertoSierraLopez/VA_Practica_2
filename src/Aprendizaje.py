@@ -1,3 +1,4 @@
+import cv2 as cv
 import numpy as np
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -40,3 +41,10 @@ class Aprendizaje:
         knn.fit(X, y)
 
         return knn
+
+
+    def entrenar_BAYES(self, X, y):
+        clf = cv.ml.NormalBayesClassifier_create()
+        clf.train(np.float32(X), cv.ml.ROW_SAMPLE, np.int32(y))
+
+        return clf
