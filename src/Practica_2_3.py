@@ -18,7 +18,7 @@ class Practica_2_3:
     def __init__(self, detector, train_path, test_path):
         self.dir_train = train_path
         self.dir_test = test_path
-        self.output_path = "data/"
+        self.output_path = "resultado/resultado_imgs/"
         self.vers = 0
 
         self.aprendizaje = Aprendizaje()
@@ -94,11 +94,11 @@ class Practica_2_3:
 ##      ## </Clasificador 2>
 
         print("Detecciones listas.")
-        representador = Representar(path=self.output_path + "resultado_imgs/", color=(23, 23, 255))
+        representador = Representar(path=self.output_path, color=(23, 23, 255))
         representador.representar(detecciones_buenas)
 
         print("Exportando imágenes...")
-        output_file = open(self.output_path + "resultado_imgs/gt.txt", "w+")
+        output_file = open(self.output_path + "gt.txt", "w+")
         for i, deteccion in enumerate(detecciones_buenas):
             output_file.write(deteccion.to_string() + '\n')
             print(i, deteccion.to_string())

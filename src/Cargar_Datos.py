@@ -118,8 +118,9 @@ class Cargar_Datos:
 
 
     def load_data_test(self, test_dir, descriptor_type='hog', dimensiones=(30, 30)):
+        print(test_dir)
         list_files = os.listdir(test_dir)
-        list_files.pop(0)
+        # list_files.pop(0)
         X = np.zeros((len(list_files), dimensiones[0] * dimensiones[1]))
         y = np.ones((len(list_files), 1))
 

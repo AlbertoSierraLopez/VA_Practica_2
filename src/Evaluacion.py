@@ -1,3 +1,5 @@
+import os
+
 from sklearn.metrics import classification_report
 from sklearn.metrics import plot_confusion_matrix
 
@@ -22,6 +24,7 @@ class Evaluacion:
 
 
     def output(self, output_path, file_list, y_predicted):
+        os.makedirs(output_path, exist_ok=True)
         output_file = open(output_path + "resultado.txt", "w+")
 
         for i in range(len(file_list)):

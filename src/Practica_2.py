@@ -1,3 +1,4 @@
+import os
 from matplotlib import pyplot as plt
 
 from Aprendizaje import Aprendizaje
@@ -83,4 +84,4 @@ class Practica_2:  # Nada, cuatro líneas de código :)
             raise Exception("Algoritmo de reducción de la dimensionalidad inválido. Usa: LDA, PCA.")
 
         self.evaluacion.print_report(y_predicted, y_test, accuracy=False, precision=True, recall=True, f1=True)
-        self.evaluacion.output("data/", file_list, y_predicted)
+        self.evaluacion.output("resultado/", file_list, y_predicted)
