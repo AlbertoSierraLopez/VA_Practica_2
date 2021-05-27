@@ -1,12 +1,10 @@
 from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import plot_confusion_matrix
 
 
 class Evaluacion:
 
     def print_report(self, y_test, y_predicted, accuracy=False, precision=False, recall=False, f1=False):
-
         report = classification_report(y_test, y_predicted, output_dict=True, zero_division=1)
 
         if accuracy:
@@ -20,5 +18,5 @@ class Evaluacion:
         print()
 
 
-    def plot_matrix(self, clf, y_test, y_predicted,):
+    def plot_matrix(self, clf, y_test, y_predicted):
         plot_confusion_matrix(clf, y_test, y_predicted)

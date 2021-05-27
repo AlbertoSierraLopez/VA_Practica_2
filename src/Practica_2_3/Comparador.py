@@ -1,39 +1,20 @@
 import cv2 as cv
 import numpy as np
 
+from Cargar_Datos import Cargar_Datos
 from Enmascarar import Enmascarar
 from skimage.feature import local_binary_pattern
 
 
 class Comparador:
 
-    def __init__(self, vers, clases_senal, dimensiones=(25, 25), descriptor_type='hog'):
+    def __init__(self, vers, clases_senal, dimensiones=(25, 25)):
         self.vers = vers
         self.clases_senal = clases_senal
         self.dimensiones = dimensiones
 
-        self.descriptor_type = descriptor_type
-        self.hog = self.get_hog()
-
         self.enmascararador = Enmascarar()
-
-
-    def get_hog(self):
-        winSize = (30, 30)
-        blockSize = (10, 10)
-        blockStride = (5, 5)
-        cellSize = (5, 5)
-        nbins = 9
-        derivAperture = 1
-        winSigma = -1.
-        histogramNormType = 0
-        L2HysThreshold = 0.2
-        # gammaCorrection = 1
-        gammaCorrection = False
-        nlevels = 64
-        signedGradient = True
-
-        return cv.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
+        self.load = Cargar_Datos()
 
 
     def detectar_Hough(self, img):
@@ -139,7 +120,9 @@ class Comparador:
         return scored_detecciones
 
 
-    def score_y_clasificar_no_senales(self, detecciones):
+    def score_y_clasificar_no_senales(self, detecciones, descriptor_type='hog'):
+        hog = self.load.get_hog()
+
         scored_detecciones = []
 
         X_train = np.array([])
@@ -178,9 +161,9 @@ class Comparador:
             img = cv.resize(img, self.dimensiones, interpolation=cv.INTER_LINEAR)
 
             descriptor = None
-            if self.descriptor_type == 'hog':
-                descriptor = self.hog.compute(img)
-            elif self.descriptor_type == 'lbp':
+            if descriptor_type == 'hog':
+                descriptor = hog.compute(img)
+            elif descriptor_type == 'lbp':
                 radius = 3
                 n_points = 8 * radius
                 descriptor = local_binary_pattern(img, n_points, radius, method='uniform')
@@ -190,7 +173,7 @@ class Comparador:
             else:
                 descriptor = np.reshape(descriptor, (1, self.dimensiones[0] * self.dimensiones[1]))
 
-                if (self.vers == 0 and deteccion.score >= 50.0) or (self.vers > 0 and deteccion.score >= 60.0):
+                if (self.vers == 0 and deteccion.score >= 48.0) or (self.vers > 0 and deteccion.score >= 58.0):
                     scored_detecciones.append(deteccion)
                     deteccion.caracteristicas = descriptor
 

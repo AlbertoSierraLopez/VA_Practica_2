@@ -9,7 +9,7 @@ class Representar:
         self.color = color
         self.path = path
 
-        self.font = cv.FONT_HERSHEY_COMPLEX
+        self.font = cv.FONT_HERSHEY_SIMPLEX
 
         os.makedirs(path, exist_ok=True)
 

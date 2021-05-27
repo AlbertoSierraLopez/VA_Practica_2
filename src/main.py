@@ -1,71 +1,28 @@
+import argparse
+
+from Practica_2 import Practica_2
 
 
-from Aprendizaje import Aprendizaje
-from Evaluacion import Evaluacion
-from Reconocimiento import Reconocimiento
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description='Entrena sober train y ejecuta el clasificador sobre imgs de test')
+    parser.add_argument(
+        '--train_path', type=str, default="./train", help='Path al directorio de imgs de train')
+    parser.add_argument(
+        '--test_path', type=str, default="./test", help='Path al directorio de imgs de test')
+    parser.add_argument(
+        '--classifier', type=str, default="BAYES", help='String con el nombre del clasificador')
+
+    args = parser.parse_args()
+
+    if args.classifier == "BAYES":
+        #detector = ...
+        None
+    else:
+        raise ValueError('Tipo de clasificador incorrecto')
 
 
-## Main
-train_dir = "data/train_recortadas"
-test_dir = "data/test_reconocimiento"
+    # Practica_2("data/train_recortadas/", "data/test_reconocimiento/", descriptor='hog', clasificador='lda', dimensiones=(30, 30))
 
-aprendizaje = Aprendizaje()
-reconocimiento = Reconocimiento()
-evaluacion = Evaluacion()
-
-
-# Ejercicio 1
-print("-- Descriptores HOG --")
-
-# Aprendizaje
-aprendizaje.load_data(train_dir, descriptor_type='hog', dimensions=(30, 30))
-lda = aprendizaje.entrenar_LDA()
-
-# Reconocimiento
-reconocimiento.load_data(test_dir, descriptor_type='hog', dimensions=(30, 30))
-predicted_LDA = reconocimiento.clasificar_LDA(lda)
-
-print("\tLDA Bayesiano")
-evaluacion.print_report(predicted_LDA, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
-# evaluacion.plot_matrix(lda, reconocimiento.X_test, reconocimiento.y_test)
-# plt.show()
-
-
-## Ejercicio 2.2: KNN
-# Aprendizaje
-Z_train_lda = aprendizaje.reducir_LDA(aprendizaje.X_train)
-knn_lda = aprendizaje.entrenar_KNN(Z_train_lda, 5)
-# Reconocimiento
-Z_test_lda = aprendizaje.reducir_LDA(reconocimiento.X_test)
-predicted_LDA_KNN = reconocimiento.clasificar_KNN(Z_test_lda, knn_lda)
-
-print("\tKNN reducido con LDA")
-evaluacion.print_report(predicted_LDA_KNN, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
-
-
-## Ejercicio 2.3: PCA
-aprendizaje.entrenar_PCA()
-# Aprendizaje
-Z_train_pca = aprendizaje.reducir_PCA(aprendizaje.X_train)
-knn_pca = aprendizaje.entrenar_KNN(Z_train_pca, 5)
-# Reconocimiento
-Z_test_pca = aprendizaje.reducir_PCA(reconocimiento.X_test)
-predicted_PCA_KNN = reconocimiento.clasificar_KNN(Z_test_pca, knn_pca)
-
-print("\tKNN reducido con PCA")
-evaluacion.print_report(predicted_PCA_KNN, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
-
-## Ejercicio 2.3: LBP
-print("-- Descriptores LBP --")
-
-# Aprendizaje
-aprendizaje.load_data(train_dir, descriptor_type='lbp', dimensions=(30, 30))
-lda = aprendizaje.entrenar_LDA()
-
-# Reconocimiento
-reconocimiento.load_data(test_dir, descriptor_type='lbp', dimensions=(30, 30))
-predicted_LDA = reconocimiento.clasificar_LDA(lda)
-
-print("\tLDA Bayesiano")
-evaluacion.print_report(predicted_LDA, reconocimiento.y_test, accuracy=False, precision=True, recall=True, f1=True)
-
+    Practica_2(args.train_path, args.test_path, descriptor='hog', clasificador=args.classifier, dimensiones=(30, 30))

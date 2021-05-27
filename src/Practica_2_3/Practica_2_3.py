@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 from Aprendizaje import Aprendizaje
+from Cargar_Datos import Cargar_Datos
 from Comparador import Comparador
 from Detector_MSER import Detector_MSER
 from Entrenar import Entrenar
@@ -17,8 +18,12 @@ class Practica_2_3:
     def __init__(self, detector, train_path, test_path):
         self.dir_train = train_path
         self.dir_test = test_path
-        self.output_path = "../../data/"
+        self.output_path = "data/"
         self.vers = 0
+
+        self.aprendizaje = Aprendizaje()
+        self.reconocimiento = Reconocimiento()
+        self.load = Cargar_Datos()
 
         self.start = time()
 
@@ -57,42 +62,36 @@ class Practica_2_3:
         detecciones = detector_mser.detecciones
 
         print("Puntuando detecciones...")
-        comparador = Comparador(vers=self.vers, clases_senal=clases_senal, dimensiones=self.dimensiones, descriptor_type='hog')
-        scored_detecciones, X_train_1, y_train_1, X_test_1 = comparador.score_y_clasificar_no_senales(detecciones)
-        print("Listo.\n")
+        comparador = Comparador(vers=self.vers, clases_senal=clases_senal, dimensiones=self.dimensiones)
+        scored_detecciones, X_train_no, y_train_no, X_test_si = comparador.score_y_clasificar_no_senales(detecciones, descriptor_type='hog')
+        print("\nListo.\n")
 
-##      ## Clasificador 1
-        aprendizaje = Aprendizaje()
-        aprendizaje.load_senales(self.dir_train, X_train_no=X_train_1, y_train_no=y_train_1, descriptor_type='hog', dimensions=(30, 30))
-        X_train_1 = aprendizaje.reducir_LDA(aprendizaje.X_train)
-        knn_1 = aprendizaje.entrenar_KNN(k=5, X=X_train_1)
+##      ## <Clasificador 1>
+        X_train, y_train = self.load.load_senales(self.dir_train, X_train_no=X_train_no, y_train_no=y_train_no, descriptor_type='hog', dimensiones=(30, 30))
+        lda = self.aprendizaje.entrenar_LDA(X_train, y_train)
 
-        reconocimiento = Reconocimiento()
-        X_test_1 = aprendizaje.reducir_LDA(X_test_1)
-        y_predicted = reconocimiento.clasificar_KNN(X_test_1, knn_1)
+        y_predicted = self.reconocimiento.clasificar_LDA(lda, X_test_si)
 
         # Quedarse con las buenas buenísimas
         index = y_predicted > 0
         scored_detecciones = np.array(scored_detecciones)
         scored_detecciones = scored_detecciones[index]
-##      ## /Clasificador 1
+##      ## </Clasificador 1>
 
         print("Eliminando duplicados...")
         limpiador = Limpieza()
         detecciones_buenas = limpiador.limpiar(scored_detecciones)
         print("Listo.\n")
 
-##      ## Clasificador 2
-        aprendizaje.load_data(self.dir_train, descriptor_type='hog', dimensions=self.dimensiones)
-        X_train_2 = aprendizaje.reducir_LDA(aprendizaje.X_train)
-        knn_2 = aprendizaje.entrenar_KNN(k=5, X=X_train_2)
+##      ## <Clasificador 2>
+        X_train, y_train = self.load.load_data_train(self.dir_train, descriptor_type='hog', dimensiones=self.dimensiones)
+        lda = self.aprendizaje.entrenar_LDA(X_train, y_train)
 
         for deteccion in detecciones_buenas:
-            X_test_2 = deteccion.caracteristicas
-            X_test_2 = aprendizaje.reducir_LDA(X_test_2)
-            sub_type = reconocimiento.clasificar_KNN(X_test_2, knn_2)
+            descriptor = deteccion.caracteristicas
+            sub_type = self.reconocimiento.clasificar_LDA(lda, descriptor)
             deteccion.sub_type = sub_type
-##      ## /Clasificador 2
+##      ## </Clasificador 2>
 
         print("Detecciones listas.")
         representador = Representar(path=self.output_path + "resultado_imgs/", color=(23, 23, 255))
