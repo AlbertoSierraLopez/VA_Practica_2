@@ -17,12 +17,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.classifier == "BAYES":
-        #detector = ...
-        None
+        clasificador = 'lda'
+    elif args.classifier == "KNN":
+        clasificador = 'knn'
     else:
         raise ValueError('Tipo de clasificador incorrecto')
 
 
     # Practica_2("data/train_recortadas/", "data/test_reconocimiento/", descriptor='hog', clasificador='lda', dimensiones=(30, 30))
 
-    Practica_2(args.train_path, args.test_path, descriptor='hog', clasificador=args.classifier, dimensiones=(30, 30))
+    Practica_2(args.train_path, args.test_path, descriptor='hog', clasificador=clasificador, dimensiones=(30, 30))
