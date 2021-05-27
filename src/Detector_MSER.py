@@ -22,6 +22,9 @@ class Detector_MSER:
     def detectar(self, path):
         src = cv.imread(path)
         img = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+        # Si no es una image, pasa
+        if img.shape[0] == 0 and img.shape[1] == 0:
+            return
 
         # Ecualizar el histograma (solo si es necesario)
         img = self.ecualizar(img)

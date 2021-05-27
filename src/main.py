@@ -91,6 +91,7 @@ if __name__ == "__main__":
     else:
         raise ValueError('Tipo de algoritmo de reducción de la dimensionalidad incorrecto')
 
-
-    Practica_2(args.train_path, test_path1, descriptor=descriptor, clasificador=clasificador, dimensionalidad=dimensionalidad, dimensiones=(30, 30))
-    Practica_2_3('Mejorado', args.train_path, test_path2)
+    if len(os.listdir(test_path1)) > 1:
+        Practica_2(args.train_path, test_path1, descriptor=descriptor, clasificador=clasificador, dimensionalidad=dimensionalidad, dimensiones=(30, 30))
+    if len(os.listdir(test_path2)) > 1:
+        Practica_2_3('Mejorado', args.train_path, test_path2)

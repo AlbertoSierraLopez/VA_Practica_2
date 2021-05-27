@@ -121,7 +121,7 @@ class Comparador:
 
 
     def score_y_clasificar_no_senales(self, detecciones, descriptor_type='hog'):
-        hog = self.load.get_hog()
+        hog = self.load.hog
 
         scored_detecciones = []
 

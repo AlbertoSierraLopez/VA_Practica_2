@@ -7,25 +7,7 @@ from skimage.feature import local_binary_pattern
 class Cargar_Datos:
 
     def __init__(self):
-        self.hog = self.get_hog()
-
-
-    def get_hog(self):
-        winSize = (30, 30)
-        blockSize = (10, 10)
-        blockStride = (5, 5)
-        cellSize = (5, 5)
-        nbins = 9
-        derivAperture = 1
-        winSigma = -1.
-        histogramNormType = 0
-        L2HysThreshold = 0.2
-        # gammaCorrection = 1
-        gammaCorrection = False
-        nlevels = 64
-        signedGradient = True
-
-        return cv.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient)
+        self.hog = cv.HOGDescriptor(_winSize=(30, 30), _blockSize=(10, 10), _blockStride=(5, 5), _cellSize=(5, 5), _nbins=9)
 
 
     def load_data_train(self, train_dir, descriptor_type='hog', dimensiones=(30, 30)):
@@ -118,7 +100,6 @@ class Cargar_Datos:
 
 
     def load_data_test(self, test_dir, descriptor_type='hog', dimensiones=(30, 30)):
-        print(test_dir)
         list_files = os.listdir(test_dir)
         # list_files.pop(0)
         X = np.zeros((len(list_files), dimensiones[0] * dimensiones[1]))
@@ -128,6 +109,12 @@ class Cargar_Datos:
 
         for i in range(len(list_files)):
             file = list_files[i]
+            # Si no es una imagen, no se procesa (.directory)
+            split_file = file.split('.')
+            extension = split_file[len(split_file) - 1]
+            if extension != 'ppm' and extension != 'jpg':
+                continue
+
             file_list.append(file)
             file_name = file.split('-')
             # Procesar imagen

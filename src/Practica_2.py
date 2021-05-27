@@ -22,7 +22,7 @@ class Practica_2:  # Nada, cuatro líneas de código :)
         self.evaluacion = Evaluacion()
         self.load = Cargar_Datos()
 
-        self.hog = self.load.get_hog()
+        self.hog = self.load.hog
 
         self.ejecutar()
 
